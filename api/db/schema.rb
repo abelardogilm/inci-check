@@ -16,8 +16,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_115223) do
     t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index "lower(name)", name: "index_allergen_aliases_on_lower_name", unique: true
     t.index ["allergen_id"], name: "index_allergen_aliases_on_allergen_id"
+    t.index ["name"], name: "index_allergen_aliases_on_name", unique: true
   end
 
   create_table "allergens", force: :cascade do |t|
