@@ -3,14 +3,6 @@
 require "rails_helper"
 
 RSpec.describe "Api::V1::Admin::Users", type: :request do
-  let(:admin_headers) do
-    credentials = ActionController::HttpAuthentication::Basic.encode_credentials(
-      Api::V1::Admin::BaseController::ADMIN_USERNAME,
-      Api::V1::Admin::BaseController::ADMIN_PASSWORD
-    )
-    { "Authorization" => credentials }
-  end
-
   describe "POST /api/v1/admin/users" do
     it "rejects requests without admin credentials" do
       post "/api/v1/admin/users", params: { email: "new@example.com", password: "password123" }
