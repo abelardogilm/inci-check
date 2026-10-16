@@ -24,4 +24,9 @@ RSpec.describe AllergenAlias, type: :model do
 
     expect(duplicate).not_to be_valid
   end
+
+  it "normalizes the name to a stripped, downcased form" do
+    alias_record = create(:allergen_alias, name: "  Parfum  ")
+    expect(alias_record.name).to eq("parfum")
+  end
 end

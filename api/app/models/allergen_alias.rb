@@ -3,7 +3,7 @@
 class AllergenAlias < ApplicationRecord
   belongs_to :allergen
 
-  normalizes :name, with: ->(name) { name.strip }
+  normalizes :name, with: ->(name) { name.strip.downcase }
 
   validates :name, presence: true, uniqueness: { case_sensitive: false }
 end
