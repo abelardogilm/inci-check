@@ -3,6 +3,9 @@
 class User < ApplicationRecord
   has_secure_password
 
+  has_many :user_allergens, dependent: :destroy
+  has_many :allergens, through: :user_allergens
+
   normalizes :email, with: ->(email) { email.strip.downcase }
 
   validates :email, presence: true, uniqueness: { case_sensitive: false },
