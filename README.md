@@ -25,12 +25,15 @@ A family member has allergies to cosmetic ingredients that are very hard to spot
 
 ```sh
 cd api
+cp .env.example .env
 bundle install
 bin/rails db:prepare
 bin/rails server
 ```
 
-Runs at `http://localhost:3000`. Run tests with `bundle exec rspec` and lint with `bundle exec rubocop`.
+Runs at `http://localhost:3000`. Run tests with `bundle exec rspec` and lint with `bundle exec rubocop`. Env vars are loaded from `.env` (via `dotenv-rails`) in development/test.
+
+The admin API (`/api/v1/admin/*`) requires HTTP Basic Auth. Set `ADMIN_USERNAME`/`ADMIN_PASSWORD` in `.env` (see `.env.example`) before deploying — see [ADR 3](docs/decisions/0003-admin-app-api-split.md).
 
 ### Web
 
