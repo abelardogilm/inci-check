@@ -33,7 +33,7 @@ describe('HomePage', () => {
 
     render(<HomePage />)
 
-    expect(await screen.findByText('Logged in as someone@example.com')).toBeInTheDocument()
+    expect(await screen.findByText('someone@example.com')).toBeInTheDocument()
   })
 
   it('calls logout when the button is clicked', async () => {
@@ -46,7 +46,7 @@ describe('HomePage', () => {
     const user = userEvent.setup()
 
     render(<HomePage />)
-    await screen.findByText('Logged in as someone@example.com')
+    await screen.findByText('someone@example.com')
     await user.click(screen.getByText('Log out'))
 
     expect(logout).toHaveBeenCalled()

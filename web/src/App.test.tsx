@@ -1,10 +1,25 @@
 import { render, screen } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
 import App from './App'
 
 describe('App', () => {
   it('renders the app heading', () => {
-    render(<App />)
+    render(
+      <MemoryRouter>
+        <App />
+      </MemoryRouter>,
+    )
     expect(screen.getByRole('heading', { name: 'inci-check' })).toBeInTheDocument()
+  })
+
+  it('links to sign up and log in', () => {
+    render(
+      <MemoryRouter>
+        <App />
+      </MemoryRouter>,
+    )
+    expect(screen.getByRole('link', { name: 'Sign up' })).toHaveAttribute('href', '/signup')
+    expect(screen.getByRole('link', { name: 'Log in' })).toHaveAttribute('href', '/login')
   })
 })
