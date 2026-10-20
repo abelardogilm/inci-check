@@ -28,4 +28,28 @@ RSpec.describe "Api::V1::App::Users", type: :request do
       expect(response).to have_http_status(:unprocessable_content)
     end
   end
+
+  describe "GET /api/v1/app/user" do
+    it "rejects requests without a token" do
+      get "/api/v1/app/user"
+
+      expect(response).to have_http_status(:unauthorized)
+    end
+
+    it "returns the current user's own email" do
+      user = create(:user)
+
+      get "/api/v1/app/user", headers: user_headers(user)
+
+      expect(response.parsed_body["email"]).to eq(user.email)
+    end
+
+    it "never returns the password digest" do
+      user = create(:user)
+
+      get "/api/v1/app/user", headers: user_headers(user)
+
+      expect(response.parsed_body).not_to have_key("password_digest")
+    end
+  end
 end

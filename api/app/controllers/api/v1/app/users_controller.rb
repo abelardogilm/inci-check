@@ -3,10 +3,18 @@
 module Api
   module V1
     module App
-      # Sign-up only, deliberately public: creating your own account doesn't
-      # require being authenticated. Viewing/updating "yourself" needs a
-      # current_user, which arrives with the session/login work.
       class UsersController < ApplicationController
+        include Authenticatable
+
+        skip_before_action :authenticate_user!, only: [:create]
+
+        # "My profile" — authenticated, always the current user (see ADR 6).
+        def show
+          render json: serialize(current_user)
+        end
+
+        # Sign-up, deliberately public: creating your own account doesn't
+        # require being authenticated.
         def create
           user = User.new(user_params)
 
@@ -24,7 +32,7 @@ module Api
         end
 
         def serialize(user)
-          user.as_json(only: %i[id email created_at])
+          user.as_json(only: %i[id email last_login_at created_at])
         end
       end
     end
