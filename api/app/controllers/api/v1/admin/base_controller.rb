@@ -3,12 +3,11 @@
 module Api
   module V1
     module Admin
-      # Interim gate for the admin API: HTTP Basic Auth via env-configured
-      # credentials. This is a stopgap until role-based auth lands alongside
-      # user sessions — see docs/decisions/0003-admin-app-api-split.md.
+      # Gate for the admin API: a Bearer token issued by SessionsController,
+      # signed and time-limited via Rails' built-in message verifier.
+      # Credentials are still a single shared pair from env vars, same
+      # caveat as ADR 3 — see docs/decisions/0004-admin-session-tokens.md.
       class BaseController < ApplicationController
-        include ActionController::HttpAuthentication::Basic::ControllerMethods
-
         ADMIN_USERNAME = ENV.fetch("ADMIN_USERNAME", "admin")
         ADMIN_PASSWORD = ENV.fetch("ADMIN_PASSWORD") do
           raise "ADMIN_PASSWORD must be set in production" if Rails.env.production?
@@ -21,10 +20,26 @@ module Api
         private
 
         def authenticate_admin!
-          authenticate_or_request_with_http_basic do |username, password|
-            ActiveSupport::SecurityUtils.secure_compare(username, ADMIN_USERNAME) &&
-              ActiveSupport::SecurityUtils.secure_compare(password, ADMIN_PASSWORD)
-          end
+          return if valid_token?
+
+          render json: { error: "Unauthorized" }, status: :unauthorized
+        end
+
+        def valid_token?
+          token = bearer_token
+          return false unless token
+
+          Rails.application.message_verifier(:admin_session).verify(token)
+          true
+        rescue ActiveSupport::MessageVerifier::InvalidSignature
+          false
+        end
+
+        def bearer_token
+          header = request.authorization
+          return nil unless header&.start_with?("Bearer ")
+
+          header.delete_prefix("Bearer ")
         end
       end
     end
