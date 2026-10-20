@@ -10,6 +10,8 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       namespace :admin do
+        resource :session, only: %i[create destroy]
+
         resources :users, only: %i[create show]
 
         resources :allergens, only: %i[index show create update destroy] do
