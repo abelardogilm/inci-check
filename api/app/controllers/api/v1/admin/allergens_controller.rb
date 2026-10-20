@@ -46,8 +46,8 @@ module Api
         end
 
         def serialize(allergen)
-          allergen.as_json(only: %i[id name created_at updated_at])
-                  .merge(aliases: allergen.allergen_aliases.pluck(:name))
+          aliases = allergen.allergen_aliases.map { |a| { id: a.id, name: a.name } }
+          allergen.as_json(only: %i[id name created_at updated_at]).merge(aliases: aliases)
         end
       end
     end
