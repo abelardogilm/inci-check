@@ -11,6 +11,10 @@ Rails.application.routes.draw do
     namespace :v1 do
       namespace :admin do
         resources :users, only: %i[create show]
+
+        resources :allergens, only: %i[index show create update destroy] do
+          resources :aliases, only: %i[create destroy], controller: "allergen_aliases"
+        end
       end
 
       namespace :app do
