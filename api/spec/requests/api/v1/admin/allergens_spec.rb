@@ -22,11 +22,11 @@ RSpec.describe "Api::V1::Admin::Allergens", type: :request do
   describe "GET /api/v1/admin/allergens/:id" do
     it "returns the allergen with its alias names" do
       allergen = create(:allergen)
-      create(:allergen_alias, allergen: allergen, name: "parfum")
+      alias_record = create(:allergen_alias, allergen: allergen, name: "parfum")
 
       get "/api/v1/admin/allergens/#{allergen.id}", headers: admin_headers
 
-      expect(response.parsed_body["aliases"]).to eq(["parfum"])
+      expect(response.parsed_body["aliases"]).to eq([{ "id" => alias_record.id, "name" => "parfum" }])
     end
 
     it "returns 404 for a missing allergen" do
