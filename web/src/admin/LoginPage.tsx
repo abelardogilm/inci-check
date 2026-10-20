@@ -1,5 +1,10 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { AuthCard } from '../ui/AuthCard'
+import { Button } from '../ui/Button'
+import { FormError } from '../ui/FormError'
+import { PasswordField } from '../ui/PasswordField'
+import { TextField } from '../ui/TextField'
 import { useAuth } from './AuthContext'
 
 export function LoginPage() {
@@ -22,29 +27,27 @@ export function LoginPage() {
   }
 
   return (
-    <main>
-      <h1>Admin login</h1>
-      <form onSubmit={handleSubmit}>
-        <label>
-          Username
-          <input
-            value={username}
-            onChange={(event) => setUsername(event.target.value)}
-            autoComplete="username"
-          />
-        </label>
-        <label>
-          Password
-          <input
-            type="password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            autoComplete="current-password"
-          />
-        </label>
-        <button type="submit">Log in</button>
+    <AuthCard title="Admin login">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <TextField
+          label="Username"
+          value={username}
+          onChange={(event) => setUsername(event.target.value)}
+          autoComplete="username"
+        />
+        <PasswordField
+          label="Password"
+          value={password}
+          onChange={setPassword}
+          autoComplete="current-password"
+        />
+        <Button type="submit">Log in</Button>
       </form>
-      {error && <p role="alert">{error}</p>}
-    </main>
+      {error && (
+        <div className="mt-4">
+          <FormError>{error}</FormError>
+        </div>
+      )}
+    </AuthCard>
   )
 }
