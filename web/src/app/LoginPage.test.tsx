@@ -53,4 +53,16 @@ describe('LoginPage', () => {
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Invalid email or password')
   })
+
+  it('reveals the password when the show button is clicked', async () => {
+    const user = userEvent.setup()
+    renderLoginPage(vi.fn())
+
+    const passwordInput = screen.getByLabelText('Password')
+    expect(passwordInput).toHaveAttribute('type', 'password')
+
+    await user.click(screen.getByRole('button', { name: 'Show' }))
+
+    expect(passwordInput).toHaveAttribute('type', 'text')
+  })
 })

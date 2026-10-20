@@ -28,18 +28,38 @@ function renderSignUpPage(signUp: (email: string, password: string) => Promise<v
   )
 }
 
+async function fillForm(
+  user: ReturnType<typeof userEvent.setup>,
+  { password, confirmPassword }: { password: string; confirmPassword: string },
+) {
+  await user.type(screen.getByLabelText('Email'), 'someone@example.com')
+  await user.type(screen.getByLabelText('Password'), password)
+  await user.type(screen.getByLabelText('Confirm password'), confirmPassword)
+}
+
 describe('SignUpPage', () => {
-  it('navigates to the home page on a successful sign-up', async () => {
+  it('navigates to the home page when passwords match', async () => {
     const signUp = vi.fn().mockResolvedValue(undefined)
     const user = userEvent.setup()
     renderSignUpPage(signUp)
 
-    await user.type(screen.getByLabelText('Email'), 'someone@example.com')
-    await user.type(screen.getByLabelText('Password'), 'password123')
+    await fillForm(user, { password: 'password123', confirmPassword: 'password123' })
     await user.click(screen.getByRole('button', { name: 'Sign up' }))
 
     expect(signUp).toHaveBeenCalledWith('someone@example.com', 'password123')
     expect(await screen.findByText('home page')).toBeInTheDocument()
+  })
+
+  it("shows an error and doesn't submit when the passwords don't match", async () => {
+    const signUp = vi.fn().mockResolvedValue(undefined)
+    const user = userEvent.setup()
+    renderSignUpPage(signUp)
+
+    await fillForm(user, { password: 'password123', confirmPassword: 'somethingelse' })
+    await user.click(screen.getByRole('button', { name: 'Sign up' }))
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Passwords do not match')
+    expect(signUp).not.toHaveBeenCalled()
   })
 
   it('shows the server error message when sign-up fails', async () => {
@@ -47,10 +67,21 @@ describe('SignUpPage', () => {
     const user = userEvent.setup()
     renderSignUpPage(signUp)
 
-    await user.type(screen.getByLabelText('Email'), 'someone@example.com')
-    await user.type(screen.getByLabelText('Password'), 'short')
+    await fillForm(user, { password: 'short', confirmPassword: 'short' })
     await user.click(screen.getByRole('button', { name: 'Sign up' }))
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Email has already been taken')
+  })
+
+  it('reveals the password when the show button is clicked', async () => {
+    const user = userEvent.setup()
+    renderSignUpPage(vi.fn())
+
+    const passwordInput = screen.getByLabelText('Password')
+    expect(passwordInput).toHaveAttribute('type', 'password')
+
+    await user.click(screen.getAllByRole('button', { name: 'Show' })[0])
+
+    expect(passwordInput).toHaveAttribute('type', 'text')
   })
 })

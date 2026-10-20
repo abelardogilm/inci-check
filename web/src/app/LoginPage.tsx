@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from './AuthContext'
+import { PasswordField } from './PasswordField'
 
 export function LoginPage() {
   const [email, setEmail] = useState('')
@@ -34,15 +35,12 @@ export function LoginPage() {
             autoComplete="email"
           />
         </label>
-        <label>
-          Password
-          <input
-            type="password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            autoComplete="current-password"
-          />
-        </label>
+        <PasswordField
+          label="Password"
+          value={password}
+          onChange={setPassword}
+          autoComplete="current-password"
+        />
         <button type="submit">Log in</button>
       </form>
       {error && <p role="alert">{error}</p>}
