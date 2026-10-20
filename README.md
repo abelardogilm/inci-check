@@ -28,6 +28,7 @@ cd api
 cp .env.example .env
 bundle install
 bin/rails db:prepare
+bin/rails db:seed # loads the EU's 26 fragrance allergens, see ADR 5
 bin/rails server
 ```
 
