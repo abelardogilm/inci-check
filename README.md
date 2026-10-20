@@ -33,7 +33,9 @@ bin/rails server
 
 Runs at `http://localhost:3000`. Run tests with `bundle exec rspec` and lint with `bundle exec rubocop`. Env vars are loaded from `.env` (via `dotenv-rails`) in development/test.
 
-The admin API (`/api/v1/admin/*`) requires HTTP Basic Auth. Set `ADMIN_USERNAME`/`ADMIN_PASSWORD` in `.env` (see `.env.example`) before deploying — see [ADR 3](docs/decisions/0003-admin-app-api-split.md).
+The admin API (`/api/v1/admin/*`) requires a session token (`POST /api/v1/admin/session` to log in). Set `ADMIN_USERNAME`/`ADMIN_PASSWORD` in `.env` (see `.env.example`) before deploying — see [ADR 4](docs/decisions/0004-admin-session-tokens.md).
+
+An admin UI lives at `/admin` in the web app (`/admin/login`, then `/admin/allergens`).
 
 ### Web
 
