@@ -2,11 +2,12 @@
 
 module AdminAuthHelper
   def admin_headers
-    credentials = ActionController::HttpAuthentication::Basic.encode_credentials(
-      Api::V1::Admin::BaseController::ADMIN_USERNAME,
-      Api::V1::Admin::BaseController::ADMIN_PASSWORD
-    )
-    { "Authorization" => credentials }
+    post "/api/v1/admin/session",
+         params: {
+           username: Api::V1::Admin::BaseController::ADMIN_USERNAME,
+           password: Api::V1::Admin::BaseController::ADMIN_PASSWORD
+         }
+    { "Authorization" => "Bearer #{response.parsed_body['token']}" }
   end
 end
 
