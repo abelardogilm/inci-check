@@ -20,7 +20,10 @@ Rails.application.routes.draw do
       end
 
       namespace :app do
+        resource :session, only: %i[create destroy]
+
         resources :users, only: %i[create]
+        resource :user, only: %i[show]
       end
     end
   end
