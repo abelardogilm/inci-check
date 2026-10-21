@@ -1,0 +1,5 @@
+services:
+  ocr:
+    build: ./ocr
+    ports:
+      - "8001:8000"
