@@ -25,6 +25,8 @@ Rails.application.routes.draw do
         resources :users, only: %i[create]
         resource :user, only: %i[show]
         resources :scans, only: %i[create]
+        resources :allergens, only: %i[index]
+        resources :user_allergens, only: %i[index create destroy]
       end
     end
   end
