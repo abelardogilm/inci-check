@@ -13,12 +13,20 @@ docker compose up ocr
 ## API
 
 - `GET /health` — `{"status": "ok"}`
-- `POST /ocr` — multipart form, field `file` (an image). Returns:
+- `POST /ocr` — multipart form, field `file` (an image). Returns each detected line with its text and average confidence, plus the confidence of each individual word — a line's average can hide one badly-misread word (e.g. "Parfum" read as "Partum" with *high* word confidence, since Tesseract confidently recognized the wrong characters):
 
 ```json
 {
   "lines": [
-    { "text": "Aqua, Parfum, Limonene", "confidence": 0.98 }
+    {
+      "text": "Aqua, Parfum, Limonene",
+      "confidence": 0.93,
+      "words": [
+        { "text": "Aqua,", "confidence": 0.95 },
+        { "text": "Parfum,", "confidence": 0.9 },
+        { "text": "Limonene", "confidence": 0.94 }
+      ]
+    }
   ]
 }
 ```
