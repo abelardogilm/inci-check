@@ -18,6 +18,7 @@ A family member has allergies to cosmetic ingredients that are very hard to spot
 
 - **`api/`** — Ruby on Rails (API-only), RSpec, RuboCop
 - **`web/`** — React + TypeScript (Vite), Vitest, oxlint
+- **`ocr/`** — self-hosted OCR (Tesseract via FastAPI), runs in Docker — see [`ocr/README.md`](ocr/README.md) and [ADR 9](docs/decisions/0009-ocr-engine.md)
 
 ## Getting started
 
@@ -47,6 +48,14 @@ npm run dev
 ```
 
 Runs at `http://localhost:5173`. Run tests with `npm test` and lint with `npm run lint`.
+
+### OCR service
+
+```sh
+docker compose up ocr
+```
+
+Runs at `http://localhost:8001`. See [`ocr/README.md`](ocr/README.md) for the API and how to test it manually.
 
 ## Contributing
 

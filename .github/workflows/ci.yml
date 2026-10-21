@@ -46,3 +46,22 @@ jobs:
         run: npm test
       - name: Build
         run: npm run build
+
+  ocr:
+    name: OCR service (Python)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ocr
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install Tesseract
+        run: sudo apt-get update && sudo apt-get install -y tesseract-ocr
+      - run: pip install -r requirements-dev.txt
+      - name: Lint
+        run: ruff check . && ruff format --check .
+      - name: Tests
+        run: pytest
