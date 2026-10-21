@@ -81,7 +81,7 @@ describe('AllergensPage', () => {
 
     render(<AllergensPage />)
     await screen.findByText('parfum')
-    await user.click(screen.getByText('Remove'))
+    await user.click(screen.getByRole('button', { name: 'Remove alias parfum' }))
 
     expect(deleteAliasSpy).toHaveBeenCalledWith('test-token', 1, 10)
   })

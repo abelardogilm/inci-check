@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
+import { Button } from '../ui/Button'
+import { Page } from '../ui/Page'
 import * as api from './api'
 import { useAuth } from './AuthContext'
 
@@ -16,12 +18,16 @@ export function HomePage() {
   }, [loadProfile])
 
   return (
-    <main>
-      <h1>inci-check</h1>
-      {email && <p>Logged in as {email}</p>}
-      <button type="button" onClick={logout}>
+    <Page>
+      <h1 className="text-3xl font-semibold tracking-tight">inci-check</h1>
+      {email && (
+        <p className="mt-2 text-ink-muted">
+          Logged in as <span className="font-mono text-ink">{email}</span>
+        </p>
+      )}
+      <Button variant="ghost" className="mt-6" onClick={logout}>
         Log out
-      </button>
-    </main>
+      </Button>
+    </Page>
   )
 }

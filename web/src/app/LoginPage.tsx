@@ -1,7 +1,11 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { AuthCard } from '../ui/AuthCard'
+import { Button } from '../ui/Button'
+import { FormError } from '../ui/FormError'
+import { PasswordField } from '../ui/PasswordField'
+import { TextField } from '../ui/TextField'
 import { useAuth } from './AuthContext'
-import { PasswordField } from './PasswordField'
 
 export function LoginPage() {
   const [email, setEmail] = useState('')
@@ -23,30 +27,34 @@ export function LoginPage() {
   }
 
   return (
-    <main>
-      <h1>Log in</h1>
-      <form onSubmit={handleSubmit}>
-        <label>
-          Email
-          <input
-            type="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            autoComplete="email"
-          />
-        </label>
+    <AuthCard title="Log in">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <TextField
+          label="Email"
+          type="email"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          autoComplete="email"
+        />
         <PasswordField
           label="Password"
           value={password}
           onChange={setPassword}
           autoComplete="current-password"
         />
-        <button type="submit">Log in</button>
+        <Button type="submit">Log in</Button>
       </form>
-      {error && <p role="alert">{error}</p>}
-      <p>
-        No account yet? <Link to="/signup">Sign up</Link>
+      {error && (
+        <div className="mt-4">
+          <FormError>{error}</FormError>
+        </div>
+      )}
+      <p className="mt-6 text-sm text-ink-muted">
+        No account yet?{' '}
+        <Link to="/signup" className="text-ink underline underline-offset-2">
+          Sign up
+        </Link>
       </p>
-    </main>
+    </AuthCard>
   )
 }
