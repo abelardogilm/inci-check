@@ -33,8 +33,13 @@ module Api
         end
 
         def scan_summary(images, results)
+          my_allergen_ids = current_user.allergens.ids.to_set
+          matched = results.flat_map(&:allergens).uniq
+
           {
-            allergens: results.flat_map(&:allergens).uniq.map { |a| { id: a.id, name: a.name } },
+            allergens: matched.map do |a|
+              { id: a.id, name: a.name, in_my_list: my_allergen_ids.include?(a.id) }
+            end,
             images_processed: results.size,
             images_failed: images.size - results.size
           }

@@ -32,6 +32,25 @@ RSpec.describe "Api::V1::App::Scans", type: :request do
       expect(response.parsed_body["allergens"].pluck("name")).to eq([allergen.name])
     end
 
+    it "flags an allergen that is on the user's personal list" do
+      allergen = create(:allergen, name: "Limonene")
+      create(:user_allergen, user: user, allergen: allergen)
+      allow(OcrClient).to receive(:extract_lines).and_return([ocr_line("Aqua, Limonene")])
+
+      post "/api/v1/app/scans", params: { images: [image] }, headers: user_headers(user)
+
+      expect(response.parsed_body["allergens"].first["in_my_list"]).to be(true)
+    end
+
+    it "does not flag an allergen that is not on the user's personal list" do
+      create(:allergen, name: "Limonene")
+      allow(OcrClient).to receive(:extract_lines).and_return([ocr_line("Aqua, Limonene")])
+
+      post "/api/v1/app/scans", params: { images: [image] }, headers: user_headers(user)
+
+      expect(response.parsed_body["allergens"].first["in_my_list"]).to be(false)
+    end
+
     describe "a match found in only one of several images" do
       let!(:limonene) { create(:allergen, name: "Limonene") }
       let!(:fragrance) { create(:allergen, name: "Fragrance") }

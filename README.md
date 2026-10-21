@@ -39,7 +39,7 @@ The admin API (`/api/v1/admin/*`) requires a session token (`POST /api/v1/admin/
 
 An admin UI lives at `/admin` in the web app (`/admin/login`, then `/admin/allergens`).
 
-`POST /api/v1/app/scans` checks a label photo (1+ images) against the allergen catalog — see [ADR 10](docs/decisions/0010-scan-endpoint.md). It needs the OCR service running; set `OCR_SERVICE_URL` in `.env` if it's not at the default `http://localhost:8001`.
+`POST /api/v1/app/scans` checks a label photo (1+ images) against the allergen catalog — see [ADR 10](docs/decisions/0010-scan-endpoint.md). It needs the OCR service running; set `OCR_SERVICE_URL` in `.env` if it's not at the default `http://localhost:8001`. Each match is flagged `in_my_list` against the user's own allergens, managed via `GET`/`POST`/`DELETE /api/v1/app/user_allergens` (catalog to pick from: `GET /api/v1/app/allergens`).
 
 ### Web
 
