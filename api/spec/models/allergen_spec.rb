@@ -31,4 +31,22 @@ RSpec.describe Allergen, type: :model do
 
     expect { allergen.destroy }.to change(AllergenAlias, :count).by(-1)
   end
+
+  it "adds a dehyphenated alias when created with a hyphenated name" do
+    allergen = create(:allergen, name: "Alpha-Isomethyl Ionone")
+
+    expect(allergen.allergen_aliases.pluck(:name)).to include("alphaisomethyl ionone")
+  end
+
+  it "does not add an alias for a name without a hyphen" do
+    allergen = create(:allergen, name: "Limonene")
+
+    expect(allergen.allergen_aliases).to be_empty
+  end
+
+  it "is idempotent when called again on an already-dehyphenated allergen" do
+    allergen = create(:allergen, name: "Alpha-Isomethyl Ionone")
+
+    expect { allergen.ensure_dehyphenated_alias }.not_to change(AllergenAlias, :count)
+  end
 end

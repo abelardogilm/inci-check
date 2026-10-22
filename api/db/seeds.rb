@@ -35,6 +35,10 @@ FRAGRANCE_ALLERGENS = [
 
 FRAGRANCE_ALLERGENS.each do |entry|
   allergen = Allergen.find_or_create_by!(name: entry[:name])
+  # Only fires Allergen#ensure_dehyphenated_alias on first creation (an
+  # after_create callback) — call it explicitly too so re-seeding an
+  # already-existing hyphenated allergen still backfills the alias.
+  allergen.ensure_dehyphenated_alias
 
   entry[:aliases].each do |alias_name|
     allergen.allergen_aliases.find_or_create_by!(name: alias_name)
