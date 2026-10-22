@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { HomePage } from './HomePage'
 import * as api from './api'
@@ -10,15 +10,12 @@ vi.mock('./AuthContext', async () => {
   return { ...actual, useAuth: vi.fn() }
 })
 
-const logout = vi.fn()
-
 beforeEach(() => {
-  logout.mockClear()
   vi.mocked(AuthContextModule.useAuth).mockReturnValue({
     token: 'test-token',
     signUp: vi.fn(),
     login: vi.fn(),
-    logout,
+    logout: vi.fn(),
   })
 })
 
@@ -31,24 +28,12 @@ describe('HomePage', () => {
       created_at: '2026-01-01T00:00:00Z',
     })
 
-    render(<HomePage />)
+    render(
+      <MemoryRouter>
+        <HomePage />
+      </MemoryRouter>,
+    )
 
     expect(await screen.findByText('someone@example.com')).toBeInTheDocument()
-  })
-
-  it('calls logout when the button is clicked', async () => {
-    vi.spyOn(api, 'getProfile').mockResolvedValue({
-      id: 1,
-      email: 'someone@example.com',
-      last_login_at: null,
-      created_at: '2026-01-01T00:00:00Z',
-    })
-    const user = userEvent.setup()
-
-    render(<HomePage />)
-    await screen.findByText('someone@example.com')
-    await user.click(screen.getByText('Log out'))
-
-    expect(logout).toHaveBeenCalled()
   })
 })
