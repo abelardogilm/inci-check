@@ -48,6 +48,30 @@ RSpec.describe "Api::V1::App::Scans", type: :request do
       expect(response.parsed_body["allergens"].pluck("name")).to include("Alpha-Isomethyl Ionone")
     end
 
+    it "matches a hyphenated name wrapped at exactly its real hyphen" do
+      create(:allergen, name: "Alpha-Isomethyl Ionone")
+      lines = [ocr_line("Alpha-"), ocr_line("Isomethyl Ionone")]
+      allow(OcrClient).to receive(:extract_lines).and_return(lines)
+      post "/api/v1/app/scans", params: { images: [image] }, headers: user_headers(user)
+      expect(response.parsed_body["allergens"].pluck("name")).to include("Alpha-Isomethyl Ionone")
+    end
+
+    it "matches a hyphenated name wrapped a second time past its real hyphen" do
+      create(:allergen, name: "Alpha-Isomethyl Ionone")
+      lines = [ocr_line("Alpha-Isome-"), ocr_line("thyl Ionone")]
+      allow(OcrClient).to receive(:extract_lines).and_return(lines)
+      post "/api/v1/app/scans", params: { images: [image] }, headers: user_headers(user)
+      expect(response.parsed_body["allergens"].pluck("name")).to include("Alpha-Isomethyl Ionone")
+    end
+
+    it "matches a hyphen-wrapped name immediately followed by the next ingredient, no space" do
+      create(:allergen, name: "Amyl Cinnamal")
+      lines = [ocr_line("Amyl Cinna-"), ocr_line("mal,Ionone")]
+      allow(OcrClient).to receive(:extract_lines).and_return(lines)
+      post "/api/v1/app/scans", params: { images: [image] }, headers: user_headers(user)
+      expect(response.parsed_body["allergens"].pluck("name")).to include("Amyl Cinnamal")
+    end
+
     it "flags an allergen that is on the user's personal list" do
       allergen = create(:allergen, name: "Limonene")
       create(:user_allergen, user: user, allergen: allergen)
