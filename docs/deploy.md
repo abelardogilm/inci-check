@@ -82,7 +82,7 @@ git subtree push --prefix=web dokku-web main
 git subtree push --prefix=ocr dokku-ocr main
 ```
 
-`inci-api` has no `Dockerfile`, so Dokku builds it with its Ruby buildpack (detected via `Gemfile`); `api/Procfile`'s `release: bin/rails db:prepare` runs migrations on every deploy. `inci-web` and `inci-ocr` each have a `Dockerfile`, so Dokku builds those directly.
+All three apps have a `Dockerfile` (see ADR 11 for why `api` moved off Dokku's Ruby buildpack), so Dokku builds each directly. `api/Procfile`'s `release: bin/rails db:prepare` is meant to run migrations on every deploy — if it doesn't fire automatically for a Dockerfile-based app on your Dokku version, run it manually after each deploy that includes a migration: `dokku run inci-api bin/rails db:prepare`.
 
 Repeat the three `git subtree push` commands (no need to re-add remotes) for every subsequent deploy.
 
