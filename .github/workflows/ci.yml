@@ -14,6 +14,8 @@ jobs:
         working-directory: api
     steps:
       - uses: actions/checkout@v4
+      - name: Install libpq (needed to build the pg gem)
+        run: sudo apt-get update && sudo apt-get install -y libpq-dev
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.3.8"
