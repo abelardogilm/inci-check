@@ -49,7 +49,7 @@ describe('ScanPage', () => {
     const user = userEvent.setup()
 
     renderPage()
-    await user.upload(screen.getByLabelText('Label photos'), makeImage())
+    await user.upload(screen.getByLabelText('Choose photos from library'), makeImage())
     await user.click(screen.getByRole('button', { name: 'Scan' }))
 
     expect(scanSpy).toHaveBeenCalledWith('test-token', [expect.objectContaining({ name: 'label.jpg' })])
@@ -61,7 +61,7 @@ describe('ScanPage', () => {
     const user = userEvent.setup()
 
     renderPage()
-    await user.upload(screen.getByLabelText('Label photos'), makeImage())
+    await user.upload(screen.getByLabelText('Choose photos from library'), makeImage())
     await user.click(screen.getByRole('button', { name: 'Scan' }))
 
     expect(await screen.findByRole('alert')).toHaveTextContent(
@@ -79,7 +79,7 @@ describe('ScanPage', () => {
     const user = userEvent.setup()
 
     renderPage()
-    await user.upload(screen.getByLabelText('Label photos'), makeImage())
+    await user.upload(screen.getByLabelText('Choose photos from library'), makeImage())
     await user.click(screen.getByRole('button', { name: 'Scan' }))
 
     expect(await screen.findByText('No allergens found.')).toBeInTheDocument()
@@ -89,7 +89,7 @@ describe('ScanPage', () => {
     const user = userEvent.setup()
 
     renderPage()
-    await user.upload(screen.getByLabelText('Label photos'), makeImage())
+    await user.upload(screen.getByLabelText('Choose photos from library'), makeImage())
     expect(screen.getByRole('button', { name: 'Scan' })).toBeEnabled()
 
     await user.click(screen.getByRole('button', { name: 'Remove label.jpg' }))
@@ -97,11 +97,28 @@ describe('ScanPage', () => {
     expect(screen.getByRole('button', { name: 'Scan' })).toBeDisabled()
   })
 
+  it('offers a dedicated single-shot camera input, without multiple set', () => {
+    renderPage()
+
+    const cameraInput = screen.getByLabelText('Take a photo')
+    expect(cameraInput).toHaveAttribute('capture', 'environment')
+    expect(cameraInput).not.toHaveAttribute('multiple')
+  })
+
+  it('adds a photo taken with the camera to the selection', async () => {
+    const user = userEvent.setup()
+
+    renderPage()
+    await user.upload(screen.getByLabelText('Take a photo'), makeImage('camera-shot.jpg'))
+
+    expect(screen.getByRole('button', { name: 'Remove camera-shot.jpg' })).toBeInTheDocument()
+  })
+
   it('adds newly chosen photos to the ones already selected', async () => {
     const user = userEvent.setup()
 
     renderPage()
-    const input = screen.getByLabelText('Label photos')
+    const input = screen.getByLabelText('Choose photos from library')
     await user.upload(input, makeImage('one.jpg'))
     await user.upload(input, makeImage('two.jpg'))
 
@@ -119,7 +136,7 @@ describe('ScanPage', () => {
     const user = userEvent.setup()
 
     renderPage()
-    await user.upload(screen.getByLabelText('Label photos'), makeImage())
+    await user.upload(screen.getByLabelText('Choose photos from library'), makeImage())
     await user.click(screen.getByRole('button', { name: 'Scan' }))
     await screen.findByText('No allergens found.')
 
@@ -140,7 +157,7 @@ describe('ScanPage', () => {
     const user = userEvent.setup()
 
     renderPage()
-    await user.upload(screen.getByLabelText('Label photos'), makeImage())
+    await user.upload(screen.getByLabelText('Choose photos from library'), makeImage())
     await user.click(screen.getByRole('button', { name: 'Scan' }))
 
     expect(await screen.findByText('Extracted text (debug)')).toBeInTheDocument()
