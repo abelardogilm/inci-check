@@ -18,13 +18,26 @@ dokku apps:create inci-ocr
 
 DNS: point `api.inci.enesenciadesarrollo.es`, `web.inci.enesenciadesarrollo.es` and `ocr.inci.enesenciadesarrollo.es` at the server's IP before continuing (domains:add below won't make the app reachable until DNS resolves).
 
+## 1. Domains + HTTPS
+
+`config/environments/production.rb` sets `force_ssl`/`assume_ssl`, so `inci-api` **requires** a TLS-terminating proxy in front of it — without it, the API will break (redirect loop), not just be insecure.
+
+Add each app's domain and enable its certificate right away, one app at a time, rather than batching all the `domains:add` calls first and `letsencrypt:enable` calls after — doing it per app avoided an error in practice:
+
 ```sh
+dokku letsencrypt:set --global email you@example.com
+
 dokku domains:add inci-api api.inci.enesenciadesarrollo.es
+dokku letsencrypt:enable inci-api
+
 dokku domains:add inci-web web.inci.enesenciadesarrollo.es
+dokku letsencrypt:enable inci-web
+
 dokku domains:add inci-ocr ocr.inci.enesenciadesarrollo.es
+dokku letsencrypt:enable inci-ocr
 ```
 
-## 1. Postgres (inci-api only)
+## 2. Postgres (inci-api only)
 
 ```sh
 dokku postgres:create inci-check-db
@@ -33,7 +46,7 @@ dokku postgres:link inci-check-db inci-api
 
 This sets `DATABASE_URL` on `inci-api` automatically — that's what `config/database.yml`'s production block reads.
 
-## 2. Config vars
+## 3. Config vars
 
 ```sh
 # From config/master.key on your machine — needed to decrypt config/credentials.yml.enc.
@@ -53,7 +66,7 @@ dokku config:set inci-api ADMIN_USERNAME=admin ADMIN_PASSWORD=change_me --no-res
 dokku docker-options:add inci-web build "--build-arg VITE_API_URL=https://api.inci.enesenciadesarrollo.es"
 ```
 
-## 3. Deploy
+## 4. Deploy
 
 This is a monorepo, but each Dokku app expects its own code at the repo root — push each subdirectory as its own subtree. From a local checkout:
 
@@ -79,17 +92,6 @@ After the first deploy, seed the allergen catalog (ADR 5):
 dokku run inci-api bin/rails db:seed
 ```
 
-## 4. HTTPS
-
-`config/environments/production.rb` sets `force_ssl`/`assume_ssl`, so `inci-api` **requires** a TLS-terminating proxy in front of it — without it, the API will break (redirect loop), not just be insecure.
-
-```sh
-dokku letsencrypt:set --global email you@example.com
-dokku letsencrypt:enable inci-api
-dokku letsencrypt:enable inci-web
-dokku letsencrypt:enable inci-ocr
-```
-
 ## 5. Basic auth
 
 One shared credential gating all three apps (ADR 11) — sign-up included, since it's not disabled in code:
@@ -102,4 +104,4 @@ dokku http-auth:enable inci-ocr <user> <password>
 
 Use the same `<user>`/`<password>` on all three so visiting `web.inci.enesenciadesarrollo.es` only prompts once per browser session (per-origin credential caching). Treat this password like any other production secret.
 
-If the Let's Encrypt HTTP-01 challenge in step 4 fails while `http-auth` is already enabled, temporarily `dokku http-auth:disable <app>`, re-run `letsencrypt:enable`, then re-enable auth.
+If the Let's Encrypt HTTP-01 challenge in step 1 fails while `http-auth` is already enabled, temporarily `dokku http-auth:disable <app>`, re-run `letsencrypt:enable`, then re-enable auth.
