@@ -49,7 +49,7 @@ npm install
 npm run dev
 ```
 
-Runs at `http://localhost:5173`. Run tests with `npm test` and lint with `npm run lint`.
+Runs at `http://localhost:5174`. Run tests with `npm test` and lint with `npm run lint`.
 
 ### OCR service
 
@@ -58,6 +58,10 @@ docker compose up ocr
 ```
 
 Runs at `http://localhost:8001`. See [`ocr/README.md`](ocr/README.md) for the API and how to test it manually.
+
+## Deploying
+
+Deployed to Dokku as three separate apps (one per service) — see [`docs/deploy.md`](docs/deploy.md) for the commands and [ADR 11](docs/decisions/0011-dokku-deployment.md) for why.
 
 ## Contributing
 
