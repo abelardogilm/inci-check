@@ -109,7 +109,21 @@ dokku proxy:ports-set inci-ocr http:80:8000 https:443:8000
 
 Verify each app with `curl -o /dev/null -w '%{http_code}\n' https://<subdomain>` — expect `200` (or `401` once basic auth is on, see below), not `502`.
 
-## 6. Basic auth — on `inci-web` only
+## 6. Raise the upload size limit (inci-api, inci-ocr)
+
+nginx's default `client_max_body_size` is 1MB — too small for real phone-camera scan photos (a 3-photo scan was ~5.6MB). Without this, a scan upload fails client-side with a generic, unhelpful error (nginx's own rejection page has no CORS headers, so the browser can't even read the real `413` status — it just looks like the request failed). `inci-ocr` needs it too: `inci-api` forwards each submitted image to it individually (ADR 10), and one photo alone can already exceed 1MB.
+
+```sh
+dokku nginx:set inci-api client-max-body-size 25m
+dokku proxy:build-config inci-api
+
+dokku nginx:set inci-ocr client-max-body-size 25m
+dokku proxy:build-config inci-ocr
+```
+
+`nginx:set` alone only stores the value — it does **not** regenerate the live vhost config. `proxy:build-config` is what actually applies it (confirmed: `dokku nginx:show-config <app>` didn't show the new limit until this ran). If an upload mysteriously fails with no useful client-side error, check `dokku nginx:error-logs <app>` for "client intended to send too large body" before assuming it's an app bug.
+
+## 7. Basic auth — on `inci-web` only
 
 Tried on all three apps first; broke the SPA's own calls to `inci-api` (see ADR 11 — nginx's basic-auth check and the app's own `Authorization: Bearer <token>` header collide, since there's only one `Authorization` header per request). Enable it only on `inci-web`, the one app with an actual UI to browse to:
 
