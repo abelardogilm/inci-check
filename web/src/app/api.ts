@@ -98,6 +98,7 @@ export interface ScanResult {
   allergens: ScanAllergen[]
   images_processed: number
   images_failed: number
+  extracted_text: string[]
 }
 
 export function submitScan(token: string, images: File[]) {

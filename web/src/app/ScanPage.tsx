@@ -1,4 +1,4 @@
-import { useState, type ChangeEvent, type FormEvent } from 'react'
+import { useEffect, useMemo, useRef, useState, type ChangeEvent, type FormEvent } from 'react'
 import { Button } from '../ui/Button'
 import { FormError } from '../ui/FormError'
 import * as api from './api'
@@ -11,11 +11,28 @@ export function ScanPage() {
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [result, setResult] = useState<api.ScanResult | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const previews = useMemo(() => images.map((image) => URL.createObjectURL(image)), [images])
+  useEffect(() => () => previews.forEach((url) => URL.revokeObjectURL(url)), [previews])
 
   function handleFilesSelected(event: ChangeEvent<HTMLInputElement>) {
-    setImages(Array.from(event.target.files ?? []))
+    const chosen = Array.from(event.target.files ?? [])
+    setImages((current) => [...current, ...chosen])
     setResult(null)
     setError(null)
+    event.target.value = ''
+  }
+
+  function handleRemove(index: number) {
+    setImages((current) => current.filter((_, i) => i !== index))
+  }
+
+  function handleReset() {
+    setImages([])
+    setResult(null)
+    setError(null)
+    if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
   async function handleSubmit(event: FormEvent) {
@@ -45,28 +62,56 @@ export function ScanPage() {
       </p>
 
       <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
-        <input
-          type="file"
-          accept="image/*"
-          multiple
-          onChange={handleFilesSelected}
-          aria-label="Label photos"
-          className="text-sm text-ink-muted"
-        />
+        <label
+          htmlFor="label-photos"
+          className="flex cursor-pointer flex-col items-center gap-1 border border-dashed border-line px-6 py-8 text-center transition-colors hover:border-ink"
+        >
+          <span className="font-medium text-ink">Click to choose photos</span>
+          <span className="text-sm text-ink-muted">or add another angle if one didn&apos;t come out clear</span>
+          <input
+            ref={fileInputRef}
+            id="label-photos"
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={handleFilesSelected}
+            aria-label="Label photos"
+            className="sr-only"
+          />
+        </label>
 
         {images.length > 0 && (
-          <ul className="flex flex-wrap gap-2 text-sm text-ink-muted">
+          <ul className="flex flex-wrap gap-3">
             {images.map((image, index) => (
-              <li key={`${image.name}-${index}`} className="border border-line px-3 py-1">
-                {image.name}
+              <li key={`${image.name}-${index}`} className="relative">
+                <img
+                  src={previews[index]}
+                  alt={image.name}
+                  className="h-20 w-20 border border-line object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleRemove(index)}
+                  aria-label={`Remove ${image.name}`}
+                  className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center border border-line bg-paper text-ink-muted transition-colors hover:border-flag hover:text-flag"
+                >
+                  ×
+                </button>
               </li>
             ))}
           </ul>
         )}
 
-        <Button type="submit" disabled={images.length === 0 || submitting}>
-          {submitting ? 'Scanning…' : 'Scan'}
-        </Button>
+        <div className="flex gap-3">
+          <Button type="submit" disabled={images.length === 0 || submitting}>
+            {submitting ? 'Scanning…' : 'Scan'}
+          </Button>
+          {(images.length > 0 || result || error) && (
+            <Button type="button" variant="ghost" onClick={handleReset}>
+              New scan
+            </Button>
+          )}
+        </div>
       </form>
 
       {error && (
@@ -101,6 +146,21 @@ export function ScanPage() {
                 </li>
               ))}
             </ul>
+          )}
+
+          {result.extracted_text.length > 0 && (
+            <details className="mt-6 border border-line p-3 text-sm">
+              <summary className="cursor-pointer text-ink-muted">
+                Extracted text (debug)
+              </summary>
+              <ul className="mt-3 flex flex-col gap-3">
+                {result.extracted_text.map((text, index) => (
+                  <li key={index} className="font-mono whitespace-pre-wrap text-ink-muted">
+                    <span className="text-ink">Image {index + 1}:</span> {text || '(no text read)'}
+                  </li>
+                ))}
+              </ul>
+            </details>
           )}
         </div>
       )}
