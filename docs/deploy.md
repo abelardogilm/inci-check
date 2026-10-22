@@ -87,7 +87,7 @@ git subtree push --prefix=web dokku-web main
 git subtree push --prefix=ocr dokku-ocr main
 ```
 
-All three apps have a `Dockerfile` (see ADR 11 for why `api` moved off Dokku's Ruby buildpack), so Dokku builds each directly. `api/Procfile`'s `release: bin/rails db:prepare` is meant to run migrations on every deploy — if it doesn't fire automatically for a Dockerfile-based app on your Dokku version, run it manually after each deploy that includes a migration: `dokku run inci-api bin/rails db:prepare`.
+All three apps have a `Dockerfile` (see ADR 11 for why `api` moved off Dokku's Ruby buildpack), so Dokku builds each directly. `api/Procfile`'s `release: bin/rails db:prepare` runs migrations on every deploy — confirmed to fire automatically for a Dockerfile-based app too, not just buildpack ones.
 
 Repeat the three `git subtree push` commands (no need to re-add remotes) for every subsequent deploy.
 
@@ -97,16 +97,28 @@ After the first deploy, seed the allergen catalog (ADR 5):
 dokku run inci-api bin/rails db:seed
 ```
 
-## 5. Basic auth
+## 5. Fix the proxy port mapping
 
-One shared credential gating all three apps (ADR 11) — sign-up included, since it's not disabled in code:
+Dokku defaults a Dockerfile app's internal proxy port to `5000`, regardless of what the `Dockerfile` actually `EXPOSE`s — all three apps came up returning `502` until this was set explicitly to match each one's real listening port (`api`: Puma on `3000`; `web`: nginx on `80`; `ocr`: already correct by luck, uvicorn on `8000`, but set it explicitly to not rely on that):
 
 ```sh
-dokku http-auth:enable inci-api <user> <password>
-dokku http-auth:enable inci-web <user> <password>
-dokku http-auth:enable inci-ocr <user> <password>
+dokku proxy:ports-set inci-api http:80:3000 https:443:3000
+dokku proxy:ports-set inci-web http:80:80 https:443:80
+dokku proxy:ports-set inci-ocr http:80:8000 https:443:8000
 ```
 
-Use the same `<user>`/`<password>` on all three so visiting `web.inci.enesenciadesarrollo.es` only prompts once per browser session (per-origin credential caching). Treat this password like any other production secret.
+Verify each app with `curl -o /dev/null -w '%{http_code}\n' https://<subdomain>` — expect `200` (or `401` once basic auth is on, see below), not `502`.
 
-If the Let's Encrypt HTTP-01 challenge in step 1 fails while `http-auth` is already enabled, temporarily `dokku http-auth:disable <app>`, re-run `letsencrypt:enable`, then re-enable auth.
+## 6. Basic auth — on `inci-web` only
+
+Tried on all three apps first; broke the SPA's own calls to `inci-api` (see ADR 11 — nginx's basic-auth check and the app's own `Authorization: Bearer <token>` header collide, since there's only one `Authorization` header per request). Enable it only on `inci-web`, the one app with an actual UI to browse to:
+
+```sh
+dokku http-auth:enable inci-web <user> <password>
+dokku http-auth:disable inci-api   # if you enabled it while following this doc before the fix above landed
+dokku http-auth:disable inci-ocr   # same
+```
+
+Treat this password like any other production secret — don't paste it into a chat, commit it, or otherwise put it somewhere it'll be logged.
+
+If the Let's Encrypt HTTP-01 challenge in step 1 fails while `http-auth` is already enabled on an app, temporarily `dokku http-auth:disable <app>`, re-run `letsencrypt:enable`, then re-enable auth.
