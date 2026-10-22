@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import App from '../App'
+import { AllergensPage } from './AllergensPage'
 import { AuthProvider } from './AuthContext'
 import { HomePage } from './HomePage'
 import { LoginPage } from './LoginPage'
@@ -18,6 +19,14 @@ export function AppRoutes() {
           element={
             <RequireAuth>
               <HomePage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/allergens"
+          element={
+            <RequireAuth>
+              <AllergensPage />
             </RequireAuth>
           }
         />
