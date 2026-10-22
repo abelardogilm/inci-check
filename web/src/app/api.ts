@@ -60,3 +60,31 @@ export function logout(token: string) {
 export function getProfile(token: string) {
   return request<User>('/api/v1/app/user', { headers: authHeaders(token) })
 }
+
+export interface Allergen {
+  id: number
+  name: string
+}
+
+export function listCatalog(token: string) {
+  return request<Allergen[]>('/api/v1/app/allergens', { headers: authHeaders(token) })
+}
+
+export function listMyAllergens(token: string) {
+  return request<Allergen[]>('/api/v1/app/user_allergens', { headers: authHeaders(token) })
+}
+
+export function addMyAllergen(token: string, allergenId: number) {
+  return request<Allergen>('/api/v1/app/user_allergens', {
+    method: 'POST',
+    headers: authHeaders(token),
+    body: JSON.stringify({ allergen_id: allergenId }),
+  })
+}
+
+export function removeMyAllergen(token: string, allergenId: number) {
+  return request<void>(`/api/v1/app/user_allergens/${allergenId}`, {
+    method: 'DELETE',
+    headers: authHeaders(token),
+  })
+}
