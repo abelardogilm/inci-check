@@ -2,7 +2,7 @@
 
 Three separate Dokku apps, one per service — see [ADR 11](decisions/0011-dokku-deployment.md) for why. Examples below use `inci.enesenciadesarrollo.es` as the base domain; swap in the real one once it's final. App names are prefixed `inci-` (`inci-api`, `inci-web`, `inci-ocr`) to avoid colliding with other projects already on the same shared Dokku server.
 
-Run everything below on the Dokku server itself (SSH in first), except the `git remote add` / `git subtree push` steps, which run from a local checkout of this repo.
+Run everything below on the Dokku server itself (SSH in first), except the `git remote add` / `git subtree push` steps and the `RAILS_MASTER_KEY` command in step 3, which need a local checkout of this repo (`config/master.key` is gitignored — it only exists on your machine) — run those as `ssh dokku@<host> <command>` from there instead of from an interactive session on the server, so the key is substituted by your local shell and never has to be read off a terminal or typed by hand.
 
 ## 0. One-time server setup
 
@@ -48,10 +48,15 @@ This sets `DATABASE_URL` on `inci-api` automatically — that's what `config/dat
 
 ## 3. Config vars
 
-```sh
-# From config/master.key on your machine — needed to decrypt config/credentials.yml.enc.
-dokku config:set inci-api RAILS_MASTER_KEY=<contents of api/config/master.key> --no-restart
+`RAILS_MASTER_KEY` needs `config/master.key`, which only exists on your machine — run this one from a **local checkout** of the repo (repo root), as an `ssh` command rather than from inside an interactive SSH session, so the key is substituted by your shell and never displayed or typed by hand (copy-pasting a `cat`-ed value by hand is exactly how this went wrong once already — e.g. zsh prints a trailing `%` for files with no final newline, which a manual copy/paste can drag along into the value):
 
+```sh
+ssh dokku@<your-server-host> config:set inci-api RAILS_MASTER_KEY=$(cat api/config/master.key) --no-restart
+```
+
+The rest can run from an interactive SSH session on the server:
+
+```sh
 # CORS (api/config/initializers/cors.rb) and the OCR client (ADR 9/10).
 dokku config:set inci-api WEB_ORIGIN=https://web.inci.enesenciadesarrollo.es --no-restart
 dokku config:set inci-api OCR_SERVICE_URL=https://ocr.inci.enesenciadesarrollo.es --no-restart
