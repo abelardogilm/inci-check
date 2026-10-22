@@ -5,6 +5,7 @@ import { AuthProvider } from './AuthContext'
 import { HomePage } from './HomePage'
 import { LoginPage } from './LoginPage'
 import { RequireAuth } from './RequireAuth'
+import { ScanPage } from './ScanPage'
 import { SignUpPage } from './SignUpPage'
 
 export function AppRoutes() {
@@ -27,6 +28,14 @@ export function AppRoutes() {
           element={
             <RequireAuth>
               <AllergensPage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/scan"
+          element={
+            <RequireAuth>
+              <ScanPage />
             </RequireAuth>
           }
         />
