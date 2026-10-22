@@ -3,10 +3,11 @@ const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000'
 export class ApiError extends Error {}
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
+  const isFormData = options.body instanceof FormData
   const response = await fetch(`${API_URL}${path}`, {
     ...options,
     headers: {
-      'Content-Type': 'application/json',
+      ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
       ...options.headers,
     },
   })
@@ -86,5 +87,26 @@ export function removeMyAllergen(token: string, allergenId: number) {
   return request<void>(`/api/v1/app/user_allergens/${allergenId}`, {
     method: 'DELETE',
     headers: authHeaders(token),
+  })
+}
+
+export interface ScanAllergen extends Allergen {
+  in_my_list: boolean
+}
+
+export interface ScanResult {
+  allergens: ScanAllergen[]
+  images_processed: number
+  images_failed: number
+}
+
+export function submitScan(token: string, images: File[]) {
+  const body = new FormData()
+  images.forEach((image) => body.append('images[]', image))
+
+  return request<ScanResult>('/api/v1/app/scans', {
+    method: 'POST',
+    headers: authHeaders(token),
+    body,
   })
 }

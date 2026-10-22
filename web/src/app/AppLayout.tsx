@@ -17,6 +17,9 @@ export function AppLayout({ children }: { children: ReactNode }) {
           <Link to="/home" className="text-ink-muted hover:text-ink">
             Home
           </Link>
+          <Link to="/scan" className="text-ink-muted hover:text-ink">
+            Scan
+          </Link>
           <Link to="/allergens" className="text-ink-muted hover:text-ink">
             My allergens
           </Link>
