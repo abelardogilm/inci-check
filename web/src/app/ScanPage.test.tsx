@@ -44,6 +44,7 @@ describe('ScanPage', () => {
       allergens: [{ id: 1, name: 'Limonene', in_my_list: true }],
       images_processed: 1,
       images_failed: 0,
+      extracted_text: ['Aqua, Limonene'],
     })
     const user = userEvent.setup()
 
@@ -73,6 +74,7 @@ describe('ScanPage', () => {
       allergens: [],
       images_processed: 1,
       images_failed: 0,
+      extracted_text: ['Aqua, Glycerin'],
     })
     const user = userEvent.setup()
 
@@ -81,5 +83,67 @@ describe('ScanPage', () => {
     await user.click(screen.getByRole('button', { name: 'Scan' }))
 
     expect(await screen.findByText('No allergens found.')).toBeInTheDocument()
+  })
+
+  it('lets a selected photo be removed before submitting', async () => {
+    const user = userEvent.setup()
+
+    renderPage()
+    await user.upload(screen.getByLabelText('Label photos'), makeImage())
+    expect(screen.getByRole('button', { name: 'Scan' })).toBeEnabled()
+
+    await user.click(screen.getByRole('button', { name: 'Remove label.jpg' }))
+
+    expect(screen.getByRole('button', { name: 'Scan' })).toBeDisabled()
+  })
+
+  it('adds newly chosen photos to the ones already selected', async () => {
+    const user = userEvent.setup()
+
+    renderPage()
+    const input = screen.getByLabelText('Label photos')
+    await user.upload(input, makeImage('one.jpg'))
+    await user.upload(input, makeImage('two.jpg'))
+
+    expect(screen.getByRole('button', { name: 'Remove one.jpg' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Remove two.jpg' })).toBeInTheDocument()
+  })
+
+  it('resets the form when starting a new scan', async () => {
+    vi.spyOn(api, 'submitScan').mockResolvedValue({
+      allergens: [],
+      images_processed: 1,
+      images_failed: 0,
+      extracted_text: ['Aqua, Glycerin'],
+    })
+    const user = userEvent.setup()
+
+    renderPage()
+    await user.upload(screen.getByLabelText('Label photos'), makeImage())
+    await user.click(screen.getByRole('button', { name: 'Scan' }))
+    await screen.findByText('No allergens found.')
+
+    await user.click(screen.getByRole('button', { name: 'New scan' }))
+
+    expect(screen.queryByText('No allergens found.')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Remove label.jpg' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Scan' })).toBeDisabled()
+  })
+
+  it('shows the extracted OCR text for debugging', async () => {
+    vi.spyOn(api, 'submitScan').mockResolvedValue({
+      allergens: [],
+      images_processed: 1,
+      images_failed: 0,
+      extracted_text: ['Aqua, Glycerin'],
+    })
+    const user = userEvent.setup()
+
+    renderPage()
+    await user.upload(screen.getByLabelText('Label photos'), makeImage())
+    await user.click(screen.getByRole('button', { name: 'Scan' }))
+
+    expect(await screen.findByText('Extracted text (debug)')).toBeInTheDocument()
+    expect(screen.getByText(/Aqua, Glycerin/)).toBeInTheDocument()
   })
 })

@@ -42,6 +42,15 @@ RSpec.describe "Api::V1::App::Scans", type: :request do
       expect(response.parsed_body["allergens"].first["in_my_list"]).to be(true)
     end
 
+    it "returns the text extracted from each processed image" do
+      create(:allergen, name: "Limonene")
+      allow(OcrClient).to receive(:extract_lines).and_return([ocr_line("Aqua, Limonene")])
+
+      post "/api/v1/app/scans", params: { images: [image] }, headers: user_headers(user)
+
+      expect(response.parsed_body["extracted_text"]).to eq(["Aqua, Limonene"])
+    end
+
     it "does not flag an allergen that is not on the user's personal list" do
       create(:allergen, name: "Limonene")
       allow(OcrClient).to receive(:extract_lines).and_return([ocr_line("Aqua, Limonene")])
