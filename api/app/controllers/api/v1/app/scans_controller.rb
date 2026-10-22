@@ -27,7 +27,7 @@ module Api
             content_type: image.content_type,
             filename: image.original_filename
           )
-          text = lines.map(&:text).join(", ")
+          text = ScanTextBuilder.call(lines.map(&:text))
           { text: text, result: AllergenMatcher.call(text) }
         rescue OcrClient::Error
           nil
