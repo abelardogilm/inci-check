@@ -4,7 +4,7 @@ import pytest
 from fastapi.testclient import TestClient
 from PIL import Image, ImageDraw
 
-from app import app, average_confidence, group_into_lines, to_unit_scale
+from app import app, average_confidence, group_into_lines, preprocess, to_unit_scale
 
 client = TestClient(app)
 
@@ -52,6 +52,15 @@ def test_ocr_reports_a_confidence_for_each_word():
     words = response.json()["lines"][0]["words"]
     assert len(words) == 3
     assert all(0 <= word["confidence"] <= 1 for word in words)
+
+
+def test_preprocess_upscales_and_converts_to_grayscale():
+    image = Image.new("RGB", (100, 50), color="white")
+
+    result = preprocess(image)
+
+    assert result.size == (150, 75)
+    assert result.mode == "L"
 
 
 def test_ocr_rejects_a_non_image_upload():

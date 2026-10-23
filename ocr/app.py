@@ -9,8 +9,18 @@ import io
 
 import pytesseract
 from fastapi import FastAPI, File, HTTPException, UploadFile
-from PIL import Image, UnidentifiedImageError
+from PIL import Image, ImageEnhance, ImageOps, UnidentifiedImageError
 from pydantic import BaseModel
+
+# Upscale and boost contrast before handing the image to Tesseract. Tried
+# against a real label photo where Tesseract misread several characters
+# (e.g. "Ionone" -> "lonone", a trailing "l" -> "!") — this combination
+# fixed some of those misreads (not all; see Allergen#ensure_confusable_i_aliases
+# on the Rails side for the rest) without adding a new dependency (Pillow is
+# already here) or a heavier preprocessing library, keeping ADR 9's
+# accuracy-for-weight trade-off intact.
+PREPROCESS_SCALE = 1.5
+PREPROCESS_CONTRAST = 1.3
 
 app = FastAPI(title="inci-check OCR service")
 
@@ -45,8 +55,17 @@ async def run_ocr(file: UploadFile = File(...)) -> OcrResponse:
     except UnidentifiedImageError:
         raise HTTPException(status_code=422, detail="Could not decode image") from None
 
-    data = pytesseract.image_to_data(image, output_type=pytesseract.Output.DICT)
+    data = pytesseract.image_to_data(preprocess(image), output_type=pytesseract.Output.DICT)
     return OcrResponse(lines=group_into_lines(data))
+
+
+def preprocess(image: Image.Image) -> Image.Image:
+    grayscale = ImageOps.grayscale(image)
+    upscaled = grayscale.resize(
+        (int(grayscale.width * PREPROCESS_SCALE), int(grayscale.height * PREPROCESS_SCALE)),
+        Image.LANCZOS,
+    )
+    return ImageEnhance.Contrast(upscaled).enhance(PREPROCESS_CONTRAST)
 
 
 def group_into_lines(data: dict) -> list[OcrLine]:

@@ -2,6 +2,8 @@
 
 Self-hosted OCR (Tesseract, via `pytesseract`) behind a small FastAPI wrapper. See [ADR 9](../docs/decisions/0009-ocr-engine.md) for why — a deliberate accuracy-for-weight trade-down appropriate for a demo project.
 
+Every image is preprocessed (grayscale, upscaled 1.5x, contrast boosted) before Tesseract sees it — see `preprocess()` in `app.py`.
+
 ## Running it
 
 From the repo root:
