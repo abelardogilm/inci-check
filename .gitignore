@@ -1,0 +1,6 @@
+# macOS
+.DS_Store
+
+# Real test photos dropped at the repo root for manual OCR testing —
+# personal/product photos, not fixtures meant to be committed.
+/test_image_*.jpg

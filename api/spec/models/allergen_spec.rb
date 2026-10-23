@@ -49,4 +49,30 @@ RSpec.describe Allergen, type: :model do
 
     expect { allergen.ensure_dehyphenated_alias }.not_to change(AllergenAlias, :count)
   end
+
+  it "adds a confusable-I alias when the name has one word-initial capital I" do
+    allergen = create(:allergen, name: "Isoeugenol")
+
+    expect(allergen.allergen_aliases.pluck(:name)).to include("lsoeugenol")
+  end
+
+  it "adds one alias per combination of word-initial capital Is for a name with several" do
+    allergen = create(:allergen, name: "Alpha-Isomethyl Ionone")
+
+    expect(allergen.allergen_aliases.pluck(:name)).to include(
+      "alpha-lsomethyl ionone", "alpha-isomethyl lonone", "alpha-lsomethyl lonone"
+    )
+  end
+
+  it "does not add a confusable-I alias for a capital I that isn't word-initial" do
+    allergen = create(:allergen, name: "FooIbar")
+
+    expect(allergen.allergen_aliases).to be_empty
+  end
+
+  it "is idempotent when called again for confusable-I aliases" do
+    allergen = create(:allergen, name: "Isoeugenol")
+
+    expect { allergen.ensure_confusable_i_aliases }.not_to change(AllergenAlias, :count)
+  end
 end
