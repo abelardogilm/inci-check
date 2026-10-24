@@ -6,7 +6,19 @@
     "logOut": "Log out"
   },
   "landing": {
-    "subtitle": "Upload a photo of an ingredient list to check it against your allergens."
+    "subtitle": "Upload a photo of an ingredient list to check it against your allergens.",
+    "howItWorks": {
+      "title": "How it works",
+      "steps": [
+        "A photo of the label is read with OCR.",
+        "Each ingredient is matched against INCI names and known synonyms.",
+        "Anything on your personal allergen list gets flagged."
+      ]
+    },
+    "why": {
+      "title": "Why I built it",
+      "body": "A family member has allergies to cosmetic ingredients that are hard to spot on a label. This started as a tool for them."
+    }
   },
   "auth": {
     "email": "Email",
