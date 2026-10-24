@@ -6,7 +6,19 @@
     "logOut": "Cerrar sesión"
   },
   "landing": {
-    "subtitle": "Sube una foto de una lista de ingredientes para comprobarla contra tus alérgenos."
+    "subtitle": "Sube una foto de una lista de ingredientes para comprobarla contra tus alérgenos.",
+    "howItWorks": {
+      "title": "Cómo funciona",
+      "steps": [
+        "Una foto de la etiqueta se procesa con OCR.",
+        "Cada ingrediente se compara con nombres INCI y sinónimos conocidos.",
+        "Lo que esté en tu lista personal de alérgenos queda marcado."
+      ]
+    },
+    "why": {
+      "title": "Por qué lo hice",
+      "body": "Un familiar tiene alergias a ingredientes cosméticos muy difíciles de detectar en una etiqueta. Empezó como una herramienta para esa persona."
+    }
   },
   "auth": {
     "email": "Correo electrónico",
