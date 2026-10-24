@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { Trans } from 'react-i18next'
 import * as api from './api'
 import { AppLayout } from './AppLayout'
 import { useAuth } from './AuthContext'
@@ -21,7 +22,11 @@ export function HomePage() {
       <h1 className="text-3xl font-semibold tracking-tight">inci-check</h1>
       {email && (
         <p className="mt-2 text-ink-muted">
-          Logged in as <span className="font-mono text-ink">{email}</span>
+          <Trans
+            i18nKey="home.loggedInAs"
+            values={{ email }}
+            components={{ email: <span className="font-mono text-ink" /> }}
+          />
         </p>
       )}
     </AppLayout>

@@ -1,0 +1,63 @@
+{
+  "nav": {
+    "home": "Home",
+    "scan": "Scan",
+    "myAllergens": "My allergens",
+    "logOut": "Log out"
+  },
+  "landing": {
+    "subtitle": "Upload a photo of an ingredient list to check it against your allergens."
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm password",
+    "show": "Show",
+    "hide": "Hide",
+    "login": {
+      "title": "Log in",
+      "submit": "Log in",
+      "noAccount": "No account yet?",
+      "signUpLink": "Sign up",
+      "invalidCredentials": "Invalid email or password"
+    },
+    "signup": {
+      "title": "Sign up",
+      "submit": "Sign up",
+      "haveAccount": "Already have an account?",
+      "logInLink": "Log in",
+      "passwordMismatch": "Passwords do not match",
+      "genericError": "Something went wrong"
+    }
+  },
+  "home": {
+    "loggedInAs": "Logged in as <email>{{email}}</email>"
+  },
+  "allergens": {
+    "title": "My allergens",
+    "subtitle": "A scan flags anything on this list it finds on a label.",
+    "empty": "You haven't added any allergens yet.",
+    "remove": "Remove {{name}}",
+    "addTitle": "Add an allergen",
+    "allAdded": "Every catalog allergen is already on your list.",
+    "add": "Add"
+  },
+  "scan": {
+    "title": "Scan a label",
+    "subtitle": "A couple of angles helps if the label is curved or glare-affected.",
+    "addPhoto": "Add a photo of the ingredient list",
+    "takePhoto": "Take a photo",
+    "chooseFromLibrary": "Choose from library",
+    "removePhoto": "Remove {{name}}",
+    "scanning": "Scanning…",
+    "scan": "Scan",
+    "newScan": "New scan",
+    "error": "Could not process the submitted photos. Try again.",
+    "result": "Result",
+    "readCount": "Read {{processed}} of {{total}} photo(s).",
+    "noAllergens": "No allergens found.",
+    "debugToggle": "Extracted text (debug)",
+    "debugImage": "Image {{index}}:",
+    "debugNoText": "(no text read)"
+  }
+}

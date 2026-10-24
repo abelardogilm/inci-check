@@ -49,7 +49,7 @@ describe('ScanPage', () => {
     const user = userEvent.setup()
 
     renderPage()
-    await user.upload(screen.getByLabelText('Choose photos from library'), makeImage())
+    await user.upload(screen.getByLabelText('Choose from library'), makeImage())
     await user.click(screen.getByRole('button', { name: 'Scan' }))
 
     expect(scanSpy).toHaveBeenCalledWith('test-token', [expect.objectContaining({ name: 'label.jpg' })])
@@ -61,7 +61,7 @@ describe('ScanPage', () => {
     const user = userEvent.setup()
 
     renderPage()
-    await user.upload(screen.getByLabelText('Choose photos from library'), makeImage())
+    await user.upload(screen.getByLabelText('Choose from library'), makeImage())
     await user.click(screen.getByRole('button', { name: 'Scan' }))
 
     expect(await screen.findByRole('alert')).toHaveTextContent(
@@ -79,7 +79,7 @@ describe('ScanPage', () => {
     const user = userEvent.setup()
 
     renderPage()
-    await user.upload(screen.getByLabelText('Choose photos from library'), makeImage())
+    await user.upload(screen.getByLabelText('Choose from library'), makeImage())
     await user.click(screen.getByRole('button', { name: 'Scan' }))
 
     expect(await screen.findByText('No allergens found.')).toBeInTheDocument()
@@ -89,7 +89,7 @@ describe('ScanPage', () => {
     const user = userEvent.setup()
 
     renderPage()
-    await user.upload(screen.getByLabelText('Choose photos from library'), makeImage())
+    await user.upload(screen.getByLabelText('Choose from library'), makeImage())
     expect(screen.getByRole('button', { name: 'Scan' })).toBeEnabled()
 
     await user.click(screen.getByRole('button', { name: 'Remove label.jpg' }))
@@ -118,7 +118,7 @@ describe('ScanPage', () => {
     const user = userEvent.setup()
 
     renderPage()
-    const input = screen.getByLabelText('Choose photos from library')
+    const input = screen.getByLabelText('Choose from library')
     await user.upload(input, makeImage('one.jpg'))
     await user.upload(input, makeImage('two.jpg'))
 
@@ -136,7 +136,7 @@ describe('ScanPage', () => {
     const user = userEvent.setup()
 
     renderPage()
-    await user.upload(screen.getByLabelText('Choose photos from library'), makeImage())
+    await user.upload(screen.getByLabelText('Choose from library'), makeImage())
     await user.click(screen.getByRole('button', { name: 'Scan' }))
     await screen.findByText('No allergens found.')
 
@@ -157,7 +157,7 @@ describe('ScanPage', () => {
     const user = userEvent.setup()
 
     renderPage()
-    await user.upload(screen.getByLabelText('Choose photos from library'), makeImage())
+    await user.upload(screen.getByLabelText('Choose from library'), makeImage())
     await user.click(screen.getByRole('button', { name: 'Scan' }))
 
     expect(await screen.findByText('Extracted text (debug)')).toBeInTheDocument()
