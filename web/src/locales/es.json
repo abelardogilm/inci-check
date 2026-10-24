@@ -1,0 +1,63 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "scan": "Escanear",
+    "myAllergens": "Mis alérgenos",
+    "logOut": "Cerrar sesión"
+  },
+  "landing": {
+    "subtitle": "Sube una foto de una lista de ingredientes para comprobarla contra tus alérgenos."
+  },
+  "auth": {
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar contraseña",
+    "show": "Mostrar",
+    "hide": "Ocultar",
+    "login": {
+      "title": "Iniciar sesión",
+      "submit": "Iniciar sesión",
+      "noAccount": "¿Aún no tienes cuenta?",
+      "signUpLink": "Regístrate",
+      "invalidCredentials": "Correo electrónico o contraseña incorrectos"
+    },
+    "signup": {
+      "title": "Registrarse",
+      "submit": "Registrarse",
+      "haveAccount": "¿Ya tienes cuenta?",
+      "logInLink": "Iniciar sesión",
+      "passwordMismatch": "Las contraseñas no coinciden",
+      "genericError": "Algo salió mal"
+    }
+  },
+  "home": {
+    "loggedInAs": "Sesión iniciada como <email>{{email}}</email>"
+  },
+  "allergens": {
+    "title": "Mis alérgenos",
+    "subtitle": "Un escaneo marca cualquier elemento de esta lista que encuentre en una etiqueta.",
+    "empty": "Aún no has añadido ningún alérgeno.",
+    "remove": "Eliminar {{name}}",
+    "addTitle": "Añadir un alérgeno",
+    "allAdded": "Ya has añadido todos los alérgenos del catálogo.",
+    "add": "Añadir"
+  },
+  "scan": {
+    "title": "Escanear una etiqueta",
+    "subtitle": "Un par de ángulos ayuda si la etiqueta está curvada o tiene reflejos.",
+    "addPhoto": "Añade una foto de la lista de ingredientes",
+    "takePhoto": "Hacer una foto",
+    "chooseFromLibrary": "Elegir de la galería",
+    "removePhoto": "Eliminar {{name}}",
+    "scanning": "Escaneando…",
+    "scan": "Escanear",
+    "newScan": "Nuevo escaneo",
+    "error": "No se pudieron procesar las fotos enviadas. Inténtalo de nuevo.",
+    "result": "Resultado",
+    "readCount": "Leídas {{processed}} de {{total}} foto(s).",
+    "noAllergens": "No se encontraron alérgenos.",
+    "debugToggle": "Texto extraído (debug)",
+    "debugImage": "Imagen {{index}}:",
+    "debugNoText": "(sin texto leído)"
+  }
+}

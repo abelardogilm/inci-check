@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Button } from '../ui/Button'
 import * as api from './api'
 import { AppLayout } from './AppLayout'
 import { useAuth } from './AuthContext'
 
 export function AllergensPage() {
+  const { t } = useTranslation()
   const { token } = useAuth()
   const [catalog, setCatalog] = useState<api.Allergen[]>([])
   const [mine, setMine] = useState<api.Allergen[]>([])
@@ -37,11 +39,11 @@ export function AllergensPage() {
 
   return (
     <AppLayout>
-      <h1 className="text-3xl font-semibold tracking-tight">My allergens</h1>
-      <p className="mt-2 text-ink-muted">A scan flags anything on this list it finds on a label.</p>
+      <h1 className="text-3xl font-semibold tracking-tight">{t('allergens.title')}</h1>
+      <p className="mt-2 text-ink-muted">{t('allergens.subtitle')}</p>
 
       {mine.length === 0 ? (
-        <p className="mt-6 text-ink-muted">You haven&apos;t added any allergens yet.</p>
+        <p className="mt-6 text-ink-muted">{t('allergens.empty')}</p>
       ) : (
         <ul className="mt-6 flex flex-wrap gap-2">
           {mine.map((allergen) => (
@@ -53,7 +55,7 @@ export function AllergensPage() {
               <button
                 type="button"
                 onClick={() => handleRemove(allergen.id)}
-                aria-label={`Remove ${allergen.name}`}
+                aria-label={t('allergens.remove', { name: allergen.name })}
                 className="text-ink-muted transition-colors hover:text-flag"
               >
                 ×
@@ -63,16 +65,16 @@ export function AllergensPage() {
         </ul>
       )}
 
-      <h2 className="mt-10 text-xl font-semibold tracking-tight">Add an allergen</h2>
+      <h2 className="mt-10 text-xl font-semibold tracking-tight">{t('allergens.addTitle')}</h2>
       {addable.length === 0 ? (
-        <p className="mt-4 text-ink-muted">Every catalog allergen is already on your list.</p>
+        <p className="mt-4 text-ink-muted">{t('allergens.allAdded')}</p>
       ) : (
         <ul className="mt-4 divide-y divide-line border-t border-line">
           {addable.map((allergen) => (
             <li key={allergen.id} className="flex items-center justify-between py-2">
               <span>{allergen.name}</span>
               <Button variant="ghost" onClick={() => handleAdd(allergen.id)}>
-                Add
+                {t('allergens.add')}
               </Button>
             </li>
           ))}

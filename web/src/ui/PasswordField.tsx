@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface PasswordFieldProps {
   label: string
@@ -8,6 +9,7 @@ interface PasswordFieldProps {
 }
 
 export function PasswordField({ label, value, onChange, autoComplete }: PasswordFieldProps) {
+  const { t } = useTranslation()
   const [visible, setVisible] = useState(false)
 
   return (
@@ -26,7 +28,7 @@ export function PasswordField({ label, value, onChange, autoComplete }: Password
           onClick={() => setVisible((v) => !v)}
           className="shrink-0 border border-line px-3 text-sm text-ink-muted transition-colors hover:border-ink hover:text-ink"
         >
-          {visible ? 'Hide' : 'Show'}
+          {visible ? t('auth.hide') : t('auth.show')}
         </button>
       </span>
     </label>

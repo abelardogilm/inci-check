@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type ChangeEvent, type FormEvent } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Button, buttonBase, buttonVariants } from '../ui/Button'
 import { FormError } from '../ui/FormError'
 import * as api from './api'
@@ -6,6 +7,7 @@ import { AppLayout } from './AppLayout'
 import { useAuth } from './AuthContext'
 
 export function ScanPage() {
+  const { t } = useTranslation()
   const { token } = useAuth()
   const [images, setImages] = useState<File[]>([])
   const [error, setError] = useState<string | null>(null)
@@ -49,7 +51,7 @@ export function ScanPage() {
       const scanResult = await api.submitScan(token!, images)
       setResult(scanResult)
     } catch {
-      setError('Could not process the submitted photos. Try again.')
+      setError(t('scan.error'))
     } finally {
       setSubmitting(false)
     }
@@ -57,20 +59,18 @@ export function ScanPage() {
 
   return (
     <AppLayout>
-      <h1 className="text-3xl font-semibold tracking-tight">Scan a label</h1>
-      <p className="mt-2 text-ink-muted">
-        A couple of angles helps if the label is curved or glare-affected.
-      </p>
+      <h1 className="text-3xl font-semibold tracking-tight">{t('scan.title')}</h1>
+      <p className="mt-2 text-ink-muted">{t('scan.subtitle')}</p>
 
       <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
         <div className="flex flex-col items-center gap-3 border border-dashed border-line px-6 py-8 text-center">
-          <span className="font-medium text-ink">Add a photo of the ingredient list</span>
+          <span className="font-medium text-ink">{t('scan.addPhoto')}</span>
           <div className="mt-2 flex gap-3">
             <label
               htmlFor="camera-photo"
               className={`${buttonBase} ${buttonVariants.primary} cursor-pointer`}
             >
-              Take a photo
+              {t('scan.takePhoto')}
               <input
                 ref={cameraInputRef}
                 id="camera-photo"
@@ -78,7 +78,7 @@ export function ScanPage() {
                 accept="image/*"
                 capture="environment"
                 onChange={handleFilesSelected}
-                aria-label="Take a photo"
+                aria-label={t('scan.takePhoto')}
                 className="sr-only"
               />
             </label>
@@ -86,7 +86,7 @@ export function ScanPage() {
               htmlFor="library-photos"
               className={`${buttonBase} ${buttonVariants.ghost} cursor-pointer`}
             >
-              Choose from library
+              {t('scan.chooseFromLibrary')}
               <input
                 ref={libraryInputRef}
                 id="library-photos"
@@ -94,7 +94,7 @@ export function ScanPage() {
                 accept="image/*"
                 multiple
                 onChange={handleFilesSelected}
-                aria-label="Choose photos from library"
+                aria-label={t('scan.chooseFromLibrary')}
                 className="sr-only"
               />
             </label>
@@ -113,7 +113,7 @@ export function ScanPage() {
                 <button
                   type="button"
                   onClick={() => handleRemove(index)}
-                  aria-label={`Remove ${image.name}`}
+                  aria-label={t('scan.removePhoto', { name: image.name })}
                   className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center border border-line bg-paper text-ink-muted transition-colors hover:border-flag hover:text-flag"
                 >
                   ×
@@ -125,11 +125,11 @@ export function ScanPage() {
 
         <div className="flex gap-3">
           <Button type="submit" disabled={images.length === 0 || submitting}>
-            {submitting ? 'Scanning…' : 'Scan'}
+            {submitting ? t('scan.scanning') : t('scan.scan')}
           </Button>
           {(images.length > 0 || result || error) && (
             <Button type="button" variant="ghost" onClick={handleReset}>
-              New scan
+              {t('scan.newScan')}
             </Button>
           )}
         </div>
@@ -143,14 +143,16 @@ export function ScanPage() {
 
       {result && (
         <div className="mt-8">
-          <h2 className="text-xl font-semibold tracking-tight">Result</h2>
+          <h2 className="text-xl font-semibold tracking-tight">{t('scan.result')}</h2>
           <p className="mt-1 text-sm text-ink-muted">
-            Read {result.images_processed} of {result.images_processed + result.images_failed}{' '}
-            photo(s).
+            {t('scan.readCount', {
+              processed: result.images_processed,
+              total: result.images_processed + result.images_failed,
+            })}
           </p>
 
           {result.allergens.length === 0 ? (
-            <p className="mt-4 text-ink-muted">No allergens found.</p>
+            <p className="mt-4 text-ink-muted">{t('scan.noAllergens')}</p>
           ) : (
             <ul className="mt-4 flex flex-wrap gap-2">
               {result.allergens.map((allergen) => (
@@ -171,13 +173,12 @@ export function ScanPage() {
 
           {result.extracted_text.length > 0 && (
             <details className="mt-6 border border-line p-3 text-sm">
-              <summary className="cursor-pointer text-ink-muted">
-                Extracted text (debug)
-              </summary>
+              <summary className="cursor-pointer text-ink-muted">{t('scan.debugToggle')}</summary>
               <ul className="mt-3 flex flex-col gap-3">
                 {result.extracted_text.map((text, index) => (
                   <li key={index} className="font-mono whitespace-pre-wrap text-ink-muted">
-                    <span className="text-ink">Image {index + 1}:</span> {text || '(no text read)'}
+                    <span className="text-ink">{t('scan.debugImage', { index: index + 1 })}</span>{' '}
+                    {text || t('scan.debugNoText')}
                   </li>
                 ))}
               </ul>
