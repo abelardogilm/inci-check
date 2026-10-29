@@ -11,10 +11,22 @@ RSpec.describe "seeding the allergen catalog", type: :model do
     expect { load Rails.root.join("db/seeds.rb") }.not_to raise_error
   end
 
-  it "seeds the full post-2023/1545 allergen list" do
+  it "seeds the full fragrance + skin-sensitizer allergen list" do
     load Rails.root.join("db/seeds.rb")
 
-    expect(Allergen.count).to eq(82)
+    expect(Allergen.count).to eq(99)
+  end
+
+  it "includes Methylisothiazolinone" do
+    load Rails.root.join("db/seeds.rb")
+
+    expect(Allergen.exists?(name: "Methylisothiazolinone")).to be true
+  end
+
+  it "includes Benzisothiazolinone" do
+    load Rails.root.join("db/seeds.rb")
+
+    expect(Allergen.exists?(name: "Benzisothiazolinone")).to be true
   end
 
   it "has no duplicate allergen names, case-insensitively" do

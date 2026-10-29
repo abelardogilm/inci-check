@@ -135,9 +135,49 @@ NEW_FRAGRANCE_ALLERGENS_2023_1545 = [
   { name: "Pinene", aliases: %w[Alpha-Pinene Beta-Pinene] }
 ].freeze
 
-ALL_FRAGRANCE_ALLERGENS = (FRAGRANCE_ALLERGENS + NEW_FRAGRANCE_ALLERGENS_2023_1545).freeze
+# Non-fragrance contact allergens from the European Baseline Series — the
+# standard patch-test panel maintained by the European Society of Contact
+# Dermatitis (ESCD), cross-referenced against Wilkinson et al. 2023
+# ("The European baseline series and recommended additions: 2023",
+# Contact Dermatitis, DOI 10.1111/cod.14255) and the PMC-hosted 2021/2022
+# ESSCA/EBS/GEIDAC results paper (PMC13238334) for the fuller substance
+# list. See docs/decisions/0005-allergen-seed-data.md for why the app's
+# allergen catalog isn't scoped to fragrances specifically, and for which
+# baseline-series entries were deliberately left out.
+#
+# Unlike Annex III, this series exists for diagnostic patch testing, not
+# cosmetic-label declaration — most of its ~35 entries (metal salts like
+# nickel/cobalt/potassium dichromate, rubber-industry chemicals, textile
+# dyes, prescription corticosteroids, "mix" reagents that aren't
+# themselves INCI names) would never appear as a literal ingredient-list
+# token for AllergenMatcher's exact-match design (ADR 8) to find — adding
+# them would give a false sense of coverage, not real protection. Only
+# entries with a genuine, single INCI/CIG name realistically found on a
+# cosmetic label are included here. Entries already covered by the
+# fragrance lists above (Myroxylon Pereirae, HICC/Lyral) are not repeated.
+SKIN_SENSITIZER_ALLERGENS = [
+  { name: "Methylisothiazolinone", aliases: %w[MIT MI] },
+  { name: "Methylchloroisothiazolinone", aliases: %w[CMIT Chloromethylisothiazolinone] },
+  { name: "Benzisothiazolinone", aliases: ["BIT"] },
+  { name: "Formaldehyde", aliases: ["Formalin"] },
+  { name: "Quaternium-15", aliases: [] },
+  { name: "Methyldibromo Glutaronitrile", aliases: ["MDBGN"] },
+  { name: "Methylparaben", aliases: [] },
+  { name: "Ethylparaben", aliases: [] },
+  { name: "Propylparaben", aliases: [] },
+  { name: "Butylparaben", aliases: [] },
+  { name: "Lanolin", aliases: ["Lanolin Alcohol", "Wool Alcohols"] },
+  { name: "Colophonium", aliases: ["Rosin"] },
+  { name: "P-Tert-Butylphenol Formaldehyde Resin", aliases: ["PTBP Resin"] },
+  { name: "Hydroxyethyl Methacrylate", aliases: ["HEMA", "2-Hydroxyethyl Methacrylate"] },
+  { name: "P-Phenylenediamine", aliases: ["PPD"] },
+  { name: "Propolis", aliases: ["Propolis Extract", "Propolis Wax"] },
+  { name: "Decyl Glucoside", aliases: [] }
+].freeze
 
-ALL_FRAGRANCE_ALLERGENS.each do |entry|
+ALL_ALLERGENS = (FRAGRANCE_ALLERGENS + NEW_FRAGRANCE_ALLERGENS_2023_1545 + SKIN_SENSITIZER_ALLERGENS).freeze
+
+ALL_ALLERGENS.each do |entry|
   allergen = Allergen.find_or_create_by!(name: entry[:name])
   # These only fire on first creation (after_create callbacks) — call them
   # explicitly too so re-seeding an already-existing allergen still
