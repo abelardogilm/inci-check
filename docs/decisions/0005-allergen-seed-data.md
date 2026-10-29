@@ -2,8 +2,14 @@
 
 ## Status
 
-Accepted. Superseded in part by the 2026-10-29 update below: the seed now
-also includes the Regulation (EU) 2023/1545 expansion.
+Accepted. Superseded in part by the 2026-10-29 updates below: the seed now
+also includes the Regulation (EU) 2023/1545 fragrance expansion and a
+curated set of non-fragrance skin-sensitizer allergens (preservatives,
+hair-dye and nail-product chemicals, etc.) — the catalog's actual scope is
+"things that cause contact allergy and can appear as a named ingredient on
+a cosmetic label," not "EU fragrance allergens" specifically. The title of
+this ADR stays as the historical record of the original, narrower
+decision.
 
 ## Context
 
@@ -60,3 +66,46 @@ Sourcing choices worth flagging for future edits to this list:
 - `api/spec/db/seeds_spec.rb` guards against future transcription slips:
   seed loads without error, totals exactly 82 allergens, no duplicate
   names, no alias colliding with another allergen's own name.
+
+## Update (2026-10-29, same day): added non-fragrance skin-sensitizer allergens
+
+Prompted by a real product label containing Methylisothiazolinone (MIT)
+and Benzisothiazolinone (BIT) — preservatives, not fragrance — that the
+catalog had no way to match. The user's explicit intent: the app should
+warn about allergens "regardless of origin," without exposing a
+fragrance/preservative/etc. category distinction in the UI (a flat list
+stays simplest for someone who just wants to enter their own allergens).
+
+Rather than invent a scope, this seeds from the **European Baseline
+Series**, the standard patch-test panel maintained by the European
+Society of Contact Dermatitis (ESCD) — an independent, clinically-curated
+"what actually causes contact allergy" list, cross-referenced against
+Wilkinson et al. 2023 (Contact Dermatitis, DOI 10.1111/cod.14255) and the
+PMC-hosted 2021/2022 ESSCA/EBS/GEIDAC results paper (PMC13238334).
+
+Deliberately **not** a full transcription of that series (~35 entries) —
+most of it exists for diagnosing contact allergy to things that were
+never cosmetic ingredients in the first place: metal salts (nickel,
+cobalt, potassium dichromate — trace contaminants, not declared
+ingredients), rubber-industry chemicals (thiuram mix, mercapto mix,
+IPPD — glove/rubber allergy, not skincare), textile dye mix, and
+prescription corticosteroids/antibiotics (budesonide, tixocortol
+pivalate, neomycin). None of those would ever appear as a literal token
+in a comma-separated cosmetic ingredient list for `AllergenMatcher`'s
+exact-match design (ADR 8) to find — seeding them would look like
+coverage without being real coverage, arguably worse than not having them
+(a user adds "Nickel" expecting a match that is structurally impossible).
+
+Seeded instead: every baseline-series entry with a genuine, single
+INCI/CIG name realistically printed on a cosmetic label —
+Methylisothiazolinone, Methylchloroisothiazolinone, Benzisothiazolinone,
+Formaldehyde, Quaternium-15, Methyldibromo Glutaronitrile, the four
+common parabens (Methyl/Ethyl/Propyl/Butylparaben), Lanolin, Colophonium,
+P-Tert-Butylphenol Formaldehyde Resin, Hydroxyethyl Methacrylate (HEMA,
+nail/gel products), P-Phenylenediamine (PPD, hair dye), Propolis, and
+Decyl Glucoside. (Myroxylon Pereirae and HICC/Lyral were already in the
+fragrance lists above — not duplicated.) Local anaesthetics (Caine mix
+components) were also left out as a judgment call: plausible in medicated
+lip/after-sun products but rare enough, and borderline enough on "is this
+really a cosmetic," that they're easy to add later if it turns out to
+matter.
